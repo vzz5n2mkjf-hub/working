@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f2f2f7">
+    <title>Курсанты</title>
+    <style>
+        :root {
+            --ios-bg: #f2f2f7;
+            --ios-card: #ffffff;
+            --ios-blue: #007aff;
+            --ios-red: #ff3b30;
+            --ios-green: #34c759;
+            --ios-orange: #ff9500;
+            --ios-purple: #af52de;
+            --ios-gray: #8e8e93;
+            --ios-gray2: #aeaeb2;
+            --ios-gray3: #c7c7cc;
+            --ios-gray4: #d1d1d6;
+            --ios-gray5: #e5e5ea;
+            --ios-gray6: #f2f2f7;
+            --ios-separator: #c6c6c8;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--ios-bg);
+            color: #000;
+            margin: 0;
+            padding: 0;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: var(--ios-card);
+            padding: 16px 20px;
+            border-bottom: 0.5px solid var(--ios-separator);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .counter {
+            font-size: 15px;
+            color: var(--ios-gray);
+            font-weight: 400;
+        }
+
+        .content {
+            padding: 20px 16px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--ios-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 16px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sort-toggle {
+            font-size: 13px;
+            color: var(--ios-blue);
+            text-transform: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-weight: 500;
+        }
+
+        .card {
+            background: var(--ios-card);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .form-row {
+            padding: 12px 16px;
+            border-bottom: 0.5px solid var(--ios-separator);
+        }
+
+        .form-row:last-child {
+            border-bottom: none;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0;
+            border: none;
+            font-size: 17px;
+            outline: none;
+            font-family: inherit;
+            background: transparent;
+            color: #000;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--ios-gray3);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:active {
+            opacity: 0.7;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-export {
+            background: var(--ios-green);
+            color: white;
+        }
+
+        .btn-import {
+            background: var(--ios-orange);
+            color: white;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            background: var(--ios-gray6);
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            outline: none;
+            color: #000;
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            opacity: 0.5;
+        }
+
+        /* Чистый список курсантов */
+        .student-list-item {
+            background: var(--ios-card);
+            padding: 12px 16px;
+            border-bottom: 0.5px solid var(--ios-separator);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .student-list-item:active {
+            background: var(--ios-gray6);
+        }
+
+        .student-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-list-item.has-reminder {
+            border-left: 3px solid var(--ios-purple);
+        }
+
+        .student-list-info {
+            flex: 1;
+        }
+
+        .student-list-name {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #000;
+        }
+
+        .student-list-details {
+            font-size: 15px;
+            color: var(--ios-gray);
+        }
+
+        .student-list-arrow {
+            color: var(--ios-gray3);
+            font-size: 18px;
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--ios-gray);
+            padding: 60px 20px;
+            font-size: 17px;
+            min-height: 200px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Детальная карточка курсанта */
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ios-bg);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .detail-modal.show {
+            display: block;
+        }
+
+        .detail-header {
+            background: var(--ios-card);
+            padding: 16px 20px;
+            padding-top: calc(20px + env(safe-area-inset-top));
+            padding-bottom: 16px;
+            border-bottom: 0.5px solid var(--ios-separator);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 60px;
+        }
+
+        .detail-back {
+            color: var(--ios-blue);
+            font-size: 17px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 0;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-height: 44px;
+        }
+
+        .detail-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .detail-content {
+            padding: 20px 16px;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section-header {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--ios-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 16px 8px;
+        }
+
+        .detail-card {
+            background: var(--ios-card);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .detail-row {
+            padding: 12px 16px;
+            border-bottom: 0.5px solid var(--ios-separator);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            color: var(--ios-gray);
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 17px;
+            color: #000;
+        }
+
+        .detail-value.phone {
+            color: var(--ios-blue);
+        }
+
+        .detail-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .detail-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--ios-card);
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .detail-btn:active {
+            opacity: 0.7;
+        }
+
+        .detail-btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .detail-btn-call .detail-btn-icon {
+            background: var(--ios-green);
+            color: white;
+        }
+
+        .detail-btn-copy .detail-btn-icon {
+            background: var(--ios-gray5);
+            color: #000;
+        }
+
+        .detail-btn-notes .detail-btn-icon {
+            background: var(--ios-purple);
+            color: white;
+        }
+
+        .detail-btn-reminder .detail-btn-icon {
+            background: var(--ios-orange);
+            color: white;
+        }
+
+        .detail-btn-delete .detail-btn-icon {
+            background: var(--ios-red);
+            color: white;
+        }
+
+        .detail-btn-text {
+            flex: 1;
+            text-align: left;
+            color: #000;
+        }
+
+        .detail-notes-preview {
+            font-size: 15px;
+            color: var(--ios-gray);
+            margin-top: 4px;
+        }
+
+        .reminder-badge {
+            display: inline-block;
+            background: var(--ios-purple);
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 6px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: calc(30px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+            z-index: 3000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 2500;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--ios-card);
+            border-radius: 14px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #000;
+        }
+
+        .modal-student-name {
+            font-size: 15px;
+            color: var(--ios-gray);
+            margin-bottom: 16px;
+        }
+
+        .reminder-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .reminder-option {
+            padding: 14px;
+            background: var(--ios-gray6);
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--ios-blue);
+        }
+
+        .reminder-option:active {
+            background: var(--ios-gray5);
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 14px;
+            background: var(--ios-gray5);
+            color: var(--ios-blue);
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-delete-note {
+            width: 100%;
+            padding: 14px;
+            background: var(--ios-red);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Курсанты</h1>
+        <div class="counter" id="counter"></div>
+    </div>
+
+    <div class="content">
+        <!-- Форма добавления -->
+        <div class="section">
+            <div class="section-header">Добавить курсанта</div>
+            <div class="card">
+                <div class="form-row">
+                    <input type="text" id="inputName" placeholder="ФИО" autocomplete="off">
+                </div>
+                <div class="form-row">
+                    <input type="text" id="inputGroup" placeholder="Группа" autocomplete="off">
+                </div>
+                <div class="form-row">
+                    <input type="tel" id="inputPhone" placeholder="Телефон" autocomplete="off">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="addStudent()" style="margin-top: 12px;">Добавить</button>
+            
+            <div class="button-group">
+                <button class="btn-export" onclick="exportData()">💾 Экспорт</button>
+                <button class="btn-import" onclick="document.getElementById('fileInput').click()">📂 Импорт</button>
+            </div>
+            <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
+        </div>
+
+        <!-- Поиск и список курсантов -->
+        <div class="section">
+            <div class="section-header">
+                <span>Все курсанты</span>
+                <button class="sort-toggle" id="sortToggle" onclick="toggleSort()">По имени</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск" oninput="renderList()">
+            </div>
+            <div id="studentsList" class="card"></div>
+        </div>
+    </div>
+
+    <!-- Детальная карточка курсанта -->
+    <div id="detailModal" class="detail-modal">
+        <div class="detail-header">
+            <button class="detail-back" onclick="closeDetailModal()">← Назад</button>
+            <div class="detail-title">Контакт</div>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="detail-content">
+            <div class="detail-section">
+                <div class="detail-section-header">Информация</div>
+                <div class="detail-card">
+                    <div class="detail-row">
+                        <div class="detail-label">ФИО</div>
+                        <div class="detail-value" id="detailName"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Группа</div>
+                        <div class="detail-value" id="detailGroup"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Телефон</div>
+                        <div class="detail-value phone" id="detailPhone"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Дата добавления</div>
+                        <div class="detail-value" id="detailDate"></div>
+                    </div>
+                    <div class="detail-row" id="detailReminderRow" style="display: none;">
+                        <div class="detail-label">Напоминание</div>
+                        <div class="reminder-badge" id="detailReminder"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-section-header">Действия</div>
+                <div class="detail-actions">
+                    <button class="detail-btn detail-btn-call" onclick="callStudent()">
+                        <div class="detail-btn-icon">📞</div>
+                        <div class="detail-btn-text">Позвонить</div>
+                    </button>
+                    <button class="detail-btn detail-btn-copy" onclick="copyStudentPhone()">
+                        <div class="detail-btn-icon">📋</div>
+                        <div class="detail-btn-text">Копировать номер</div>
+                    </button>
+                    <button class="detail-btn detail-btn-notes" onclick="openNotesModal()">
+                        <div class="detail-btn-icon">📝</div>
+                        <div>
+                            <div class="detail-btn-text">Заметки</div>
+                            <div class="detail-notes-preview" id="detailNotesPreview"></div>
+                        </div>
+                    </button>
+                    <button class="detail-btn detail-btn-reminder" onclick="openReminderModal()">
+                        <div class="detail-btn-icon">⏰</div>
+                        <div class="detail-btn-text">Напомнить о звонке</div>
+                    </button>
+                    <button class="detail-btn detail-btn-delete" onclick="deleteCurrentStudent()">
+                        <div class="detail-btn-icon">🗑️</div>
+                        <div class="detail-btn-text" style="color: var(--ios-red);">Удалить курсанта</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно заметок -->
+    <div id="notesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Заметки</div>
+            <div class="modal-student-name" id="notesStudentName"></div>
+            <textarea id="notesInput" placeholder="Добавьте заметку..."></textarea>
+            <button class="btn-primary" onclick="saveNotes()" style="margin-top: 12px;">Сохранить</button>
+            <button class="btn-delete-note" id="deleteNoteBtn" onclick="deleteNote()" style="display: none;">Удалить заметку</button>
+            <button class="btn-cancel" onclick="closeNotesModal()" style="margin-top: 10px;">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно напоминаний -->
+    <div id="reminderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Напомнить о звонке</div>
+            <div class="modal-student-name" id="reminderStudentName"></div>
+            <div class="reminder-options">
+                <button class="reminder-option" onclick="setReminder(5)">Через 5 минут</button>
+                <button class="reminder-option" onclick="setReminder(15)">Через 15 минут</button>
+                <button class="reminder-option" onclick="setReminder(30)">Через 30 минут</button>
+                <button class="reminder-option" onclick="setReminder(60)">Через 1 час</button>
+                <button class="reminder-option" onclick="setReminder(180)">Через 3 часа</button>
+                <button class="reminder-option" onclick="setReminder(1440)">Завтра</button>
+            </div>
+            <button class="btn-cancel" onclick="closeReminderModal()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Всплывающее уведомление -->
+    <div id="toast" class="toast">Номер скопирован!</div>
+
+    <script>
+        let students = JSON.parse(localStorage.getItem('driving_students')) || [];
+        let currentStudentId = null;
+        let sortByDate = false;
+
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        function saveData() {
+            localStorage.setItem('driving_students', JSON.stringify(students));
+        }
+
+        function addStudent() {
+            const name = document.getElementById('inputName').value.trim();
+            const group = document.getElementById('inputGroup').value.trim();
+            const phone = document.getElementById('inputPhone').value.trim();
+
+            if (!name || !phone) {
+                alert('Введите ФИО и номер телефона!');
+                return;
+            }
+
+            students.push({
+                id: Date.now(),
+                name,
+                group,
+                phone,
+                notes: '',
+                reminder: null,
+                createdAt: new Date().toISOString()
+            });
+
+            saveData();
+            renderList();
+            
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputGroup').value = '';
+            document.getElementById('inputPhone').value = '';
+        }
+
+        function deleteStudent(id) {
+            if (confirm('Удалить этого курсанта?')) {
+                students = students.filter(s => s.id !== id);
+                saveData();
+                closeDetailModal();
+                renderList();
+            }
+        }
+
+        function deleteCurrentStudent() {
+            deleteStudent(currentStudentId);
+        }
+
+        function copyPhone(phone) {
+            const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+            
+            navigator.clipboard.writeText(cleanPhone).then(() => {
+                showToast('Номер скопирован!');
+            }).catch(() => {
+                const textArea = document.createElement("textarea");
+                textArea.value = cleanPhone;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+                showToast('Номер скопирован!');
+            });
+        }
+
+        function copyStudentPhone() {
+            const student = students.find(s => s.id === currentStudentId);
+            copyPhone(student.phone);
+        }
+
+        function callStudent() {
+            const student = students.find(s => s.id === currentStudentId);
+            const telLink = student.phone.replace(/[^\d+]/g, '');
+            window.location.href = `tel:${telLink}`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function exportData() {
+            if (students.length === 0) {
+                showToast('Нет данных для экспорта');
+                return;
+            }
+
+            const dataStr = JSON.stringify(students, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const date = new Date().toISOString().split('T')[0];
+            const filename = `курсанты_${date}.json`;
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Данные экспортированы!');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (!Array.isArray(importedData)) {
+                        throw new Error('Неверный формат файла');
+                    }
+
+                    if (confirm(`Импортировать ${importedData.length} курсантов? Текущие данные будут заменены.`)) {
+                        students = importedData;
+                        saveData();
+                        renderList();
+                        showToast('Данные импортированы!');
+                    }
+                } catch (error) {
+                    alert('Ошибка при чтении файла: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            event.target.value = '';
+        }
+
+        function openDetailModal(id) {
+            currentStudentId = id;
+            const student = students.find(s => s.id === id);
+            
+            document.getElementById('detailName').textContent = student.name;
+            document.getElementById('detailGroup').textContent = student.group || '—';
+            document.getElementById('detailPhone').textContent = student.phone;
+            document.getElementById('detailDate').textContent = student.createdAt ? formatDate(student.createdAt) : '—';
+            
+            const notesPreview = document.getElementById('detailNotesPreview');
+            if (student.notes && student.notes.trim()) {
+                notesPreview.textContent = student.notes.substring(0, 50) + (student.notes.length > 50 ? '...' : '');
+            } else {
+                notesPreview.textContent = 'Нет заметок';
+            }
+            
+            const reminderRow = document.getElementById('detailReminderRow');
+            if (student.reminder && student.reminder > Date.now()) {
+                reminderRow.style.display = 'block';
+                document.getElementById('detailReminder').textContent = `⏰ ${formatReminderTime(student.reminder)}`;
+            } else {
+                reminderRow.style.display = 'none';
+            }
+            
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('show');
+            currentStudentId = null;
+        }
+
+        function openNotesModal() {
+            const student = students.find(s => s.id === currentStudentId);
+            document.getElementById('notesStudentName').textContent = student.name;
+            document.getElementById('notesInput').value = student.notes || '';
+            
+            const deleteBtn = document.getElementById('deleteNoteBtn');
+            deleteBtn.style.display = student.notes ? 'block' : 'none';
+            
+            document.getElementById('notesModal').classList.add('show');
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notesModal').classList.remove('show');
+        }
+
+        function saveNotes() {
+            const student = students.find(s => s.id === currentStudentId);
+            student.notes = document.getElementById('notesInput').value.trim();
+            saveData();
+            closeNotesModal();
+            openDetailModal(currentStudentId);
+            renderList();
+            showToast('Заметки сохранены!');
+        }
+
+        function deleteNote() {
+            if (confirm('Удалить заметку?')) {
+                const student = students.find(s => s.id === currentStudentId);
+                student.notes = '';
+                saveData();
+                closeNotesModal();
+                openDetailModal(currentStudentId);
+                renderList();
+                showToast('Заметка удалена!');
+            }
+        }
+
+        function openReminderModal() {
+            const student = students.find(s => s.id === currentStudentId);
+            document.getElementById('reminderStudentName').textContent = student.name;
+            document.getElementById('reminderModal').classList.add('show');
+        }
+
+        function closeReminderModal() {
+            document.getElementById('reminderModal').classList.remove('show');
+        }
+
+        function setReminder(minutes) {
+            const student = students.find(s => s.id === currentStudentId);
+            student.reminder = Date.now() + (minutes * 60 * 1000);
+            saveData();
+            closeReminderModal();
+            
+            const timeStr = minutes < 60 ? `${minutes} мин` : minutes < 1440 ? `${minutes / 60} ч` : 'завтра';
+            showToast(`Напоминание через ${timeStr}`);
+            openDetailModal(currentStudentId);
+            renderList();
+        }
+
+        function checkReminders() {
+            const now = Date.now();
+            let hasChanges = false;
+
+            students.forEach(student => {
+                if (student.reminder && student.reminder <= now) {
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('Напоминание о звонке', {
+                            body: `Перезвоните: ${student.name}\n${student.phone}`,
+                            icon: '📞'
+                        });
+                    } else {
+                        alert(`Напоминание: перезвоните ${student.name}\n${student.phone}`);
+                    }
+
+                    student.reminder = null;
+                    hasChanges = true;
+                }
+            });
+
+            if (hasChanges) {
+                saveData();
+                renderList();
+            }
+        }
+
+        function formatReminderTime(timestamp) {
+            const now = Date.now();
+            const diff = timestamp - now;
+            
+            if (diff <= 0) return 'Сейчас';
+            
+            const minutes = Math.floor(diff / 60000);
+            if (minutes < 60) return `через ${minutes} мин`;
+            
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `через ${hours} ч`;
+            
+            const days = Math.floor(hours / 24);
+            return `через ${days} дн`;
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('ru-RU', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        }
+
+        function toggleSort() {
+            sortByDate = !sortByDate;
+            const toggleBtn = document.getElementById('sortToggle');
+            toggleBtn.textContent = sortByDate ? 'По дате' : 'По имени';
+            renderList();
+        }
+
+        function renderList() {
+            const listContainer = document.getElementById('studentsList');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            document.getElementById('counter').textContent = `${students.length} контактов`;
+
+            const filtered = students.filter(s => 
+                s.name.toLowerCase().includes(searchTerm) || 
+                (s.group && s.group.toLowerCase().includes(searchTerm)) ||
+                (s.notes && s.notes.toLowerCase().includes(searchTerm))
+            );
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <div>Курсанты не найдены</div>
+                    </div>
+                `;
+                return;
+            }
+
+            if (sortByDate) {
+                filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            } else {
+                filtered.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+            }
+
+            let html = '';
+            filtered.forEach(s => {
+                const hasReminder = s.reminder && s.reminder > Date.now();
+                const reminderClass = hasReminder ? 'has-reminder' : '';
+                const dateStr = s.createdAt ? formatDate(s.createdAt) : '';
+                
+                html += `
+                    <div class="student-list-item ${reminderClass}" onclick="openDetailModal(${s.id})">
+                        <div class="student-list-info">
+                            <div class="student-list-name">${s.name}</div>
+                            <div class="student-list-details">
+                                ${s.group ? `Группа: ${s.group}` : ''} ${s.group && s.phone ? '•' : ''} ${s.phone}
+                                ${dateStr ? ` • ${dateStr}` : ''}
+                            </div>
+                        </div>
+                        <div class="student-list-arrow">›</div>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        }
+
+        renderList();
+        checkReminders();
+        setInterval(checkReminders, 30000);
+        setInterval(renderList, 60000);
+    </script>
+</body>
+</html>
+
